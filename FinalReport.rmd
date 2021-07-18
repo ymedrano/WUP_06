@@ -11,6 +11,17 @@ require(tigerstats)
 require(knitr)
 GSS <-read.csv(file="GSScsv.csv",header=TRUE)
 ```
+```{r }
+# this is the slick way to make all char variables into factor variables
+GSSN= select(GSS, ! is.numeric)
+GSSN=purrr::map(GSSN, as.factor)
+GSSN$X<-1:178
+#GSSN = data.frame(GSSN)
+GSS2=select(GSS,is.numeric)
+# merge two data frames by ID
+GSS <- merge(GSSN,GSS2,by="X")
+```
+
 
 # Introduction
 
@@ -32,6 +43,16 @@ If not, then whose view differs from whom??
 ### Graphical Descriptive Results
 
 <!--Graphical results here.  Make sure to show your code.  Provide appropriate labels for axes, giving units if possible, and provide a good title for the graph, too.  Use the graphical results to describe the patterns if any that exist in the data as focused toward the research question. Bottom line is to explain the features of the graph that are relevant to conforming or departing to what is expected by your null hypothesis !-->
+
+#### Plot barplots tigerstats way
+
+```{r}
+barchartGC(~RACE + CAPPUN,data=GSS)
+barchartGC(~RACE + CAPPUN,data=GSS, type="percent")
+
+```
+
+This shows that BLACK are more against CAPPUN compared to WHITE and OTHER.  
 
 ### Numerical Descriptive Results
 
