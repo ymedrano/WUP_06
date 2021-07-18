@@ -10,16 +10,9 @@ require(tidyverse)
 require(tigerstats)
 require(knitr)
 GSS <-read.csv(file="GSScsv.csv",header=TRUE)
-```
-```{r }
-# this is the slick way to make all char variables into factor variables
-GSSN= select(GSS, ! is.numeric)
-GSSN=purrr::map(GSSN, as.factor)
-GSSN$X<-1:178
-#GSSN = data.frame(GSSN)
-GSS2=select(GSS,is.numeric)
-# merge two data frames by ID
-GSS <- merge(GSSN,GSS2,by="X")
+library(dplyr)
+GSS <- GSS %>%
+mutate(across(where(is.character), as.factor))
 ```
 
 
