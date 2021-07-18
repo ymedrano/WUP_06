@@ -57,13 +57,91 @@ rowPerc(table1)
 colPerc(table1)
 ```
 
-This table shows that 34.62 from the BLACK group are in favor of CAPPUN, while 83.33 from the OTHER group and 68.66 from the WHITE group are in favor of CAPPUN. That shows that there is a signofocant difference between BLACK versus OTHER and WHITE.
+This table shows that 34.62 from the BLACK group are in favor of CAPPUN, while 83.33 from the OTHER group and 68.66 from the WHITE group are in favor of CAPPUN. That shows that there is a significant difference between BLACK versus OTHER and WHITE.  
 
 ## Inferential Results
 
 <!--State hypothesis clearly.  Make sure your discussion of the inferential test covers all the aspects that the test output produces, such as test statistic, p-value etc.  Make a decision about the null hypothesis, explain the assumptions on which the selected test/procedure was based, and why the chosen procedure satisfys the assumptions and is appropriate to answer the research question!-->
 
+```{r}
+chisq.test(table1)
+print("killroy was here")
+chisqtestGC(table1)
+```
+
+```{r}
+fisherXY = function(x, y, confL = 0, printAll=FALSE){
+  # Inputs: 
+  #   x: factor variable, 2 levels
+  #   y: factor variable, n levels
+  # confL: confidence level, default = 0.95
+  #        print only those tables, results if p-value < (1-confL)
+  # printAll: overide the 'print only if p-value < (1-confL), and
+  #           print all tables and fisher test results
+  #
+  # Constraint:
+  #   x and y must be same length
+  #
+  # Outputs:
+  #   All 2x2 Fisher exact tests
+  
+  if(confL<0 || confL> 1){
+    print('error: confL must be between 0 and 1')
+    return(999)
+  }
+  
+  if(!is.factor(x)) x=as.factor(x)
+  if(!is.factor(y)) y=as.factor(y)
+  
+  fisherTable = as.matrix(table(x, y))
+  cat('\ncontingency table:\n')
+  print(fisherTable)
+  cat('\n***All 2X2 tests****\n\n')
+
+  # all 2x2 tests
+  levelsY = levels(y)
+  levelsX = levels(x)
+  
+  m = length(levelsX)
+  n = length(levelsY)
+  
+  confLevel = 0.95
+  if (confL !=0 ) confLevel=confL
+  
+  for (i in 1:(m-1))
+       for(j in ((i+1):m))
+          for (k in 1:(n-1))
+             for (l in ((k+1):n)) {
+                
+                 fisherIndexX = c(i,j)
+                 fisherIndexY = c(k,l)
+                 
+                 fTempTable = as.matrix(fisherTable[fisherIndexX,
+                                        fisherIndexY])
+                 
+                 fisherTest=fisher.test(fTempTable, conf.int = TRUE, 
+                              conf.level = confLevel)
+                 
+                 if((fisherTest$p.value < (1-confLevel) ) || printAll){
+                   
+                       print(c(levelsX[i], levelsX[j]))
+                       print(c(levelsY[k], levelsY[l]))
+                       print(fTempTable)
+                       print(fisherTest)
+                       cat('\n')
+                 }
+                 
+        }
+}
+
+```
+
+```{r}
+fisherXY(GSS$RACE,GSS$CAPPUN, confL=0, printAll=TRUE)
+```
 
 # Discussion and Conclusion
 
 <!--Discussion and conclusion here.  If you found a relationship be sure to consider whether the relationship occurs because one of the variavbles causes the other, or whether they perhasps are related for some other reason.  Watch the chapter 6 videos from the GeorgeTown videos collection.!-->
+
+Looking at the fisherXY test, we see that there is a significant difference between BLACK and WHITE and OTHER. It also shows that there is not a big difference between WHITE and OTHER.  
